@@ -13,6 +13,7 @@ This project implements a message slot kernel module that facilitates inter-proc
 - `message_slot.h`: Header file
 - `tester1.c`: Verifies edge cases and interfunction logic
 - `tester2.c`: Verfies writes and reads over large random data
+- `tester3.c`: Verifies kernel module
 
 ## Setup, Saftey and Workflow
 
@@ -48,6 +49,13 @@ sudo chmod o+rw <device_file>
 ```
 gcc -O3 -Wall -std=c11 tester#.c -o tester#
 ./tester <device_file>
+```
+
+Shortcut to running tests (loads->tests->unloads):
+```
+make test1
+make test2
+make test3
 ```
 
 ## Kernel Module: `message_slot.c`
