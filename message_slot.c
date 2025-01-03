@@ -20,29 +20,6 @@ MODULE_LICENSE("GPL");
 
 static struct message_slot* all_slots[MAX_MINOR_NUM];
 
-/* =========== Structs =========== */
-
-struct message_slot {
-    /*
-    Struct to describe individual message slots (device files with different minor numbers)
-    Contains a list of channels in the message slot
-    */
-    int minor;
-    unsigned long channel_id;
-    struct channel* next;
-    struct channel* tail;
-}; 
-
-struct channel {
-    /*
-    Struct to describe individual channels in a message slot
-    */
-    char* message;
-    int minor;
-    unsigned long channel_id;
-    struct channel* next;
-};
-
 /* =========== Helper Functions =========== */
 
 int legal_minor(int minor) {
@@ -60,7 +37,7 @@ int legal_minor(int minor) {
     return ((minor >= 0) && (minor < MAX_MINOR_NUM));
 }
 
-struct channel* find_channel(struct message_slot* slot, int channel_id) {
+struct channel* find_channel(struct message_slot* slot, unsigned long channel_id) {
     /*
     Find a channel in the message slot channels list
 
@@ -88,7 +65,7 @@ struct channel* find_channel(struct message_slot* slot, int channel_id) {
     return NULL;
 }
 
-int insert_newchannel(struct message_slot* slot, int channel_id) {
+int insert_newchannel(struct message_slot* slot, unsigned long channel_id) {
     /*
     Insert a new channel to the message slot channels list
 
@@ -114,7 +91,7 @@ int insert_newchannel(struct message_slot* slot, int channel_id) {
 
     new_channel->channel_id = channel_id;
     new_channel->next = NULL;
-    new_channel->minor = slot->minor;
+    
     // Allocate memory for new channel message
     new_channel->message = kmalloc((1+MAX_MESSAGE_SIZE)*sizeof(char), GFP_KERNEL); // Flag: GFP_KERNEL = memory allocation in kernel space
     if (new_channel->message == NULL) {
@@ -190,7 +167,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
 
     struct message_slot* slot;
     struct channel* channel;
-    int channel_id;
+    unsigned long channel_id;
     int minor;
     ssize_t message_length;
     
@@ -212,7 +189,7 @@ static ssize_t device_read(struct file* file, char __user* buffer, size_t length
         printk(KERN_ERR "Illegal minor number: %d\n", minor);
         return -EINVAL;}
 
-    channel_id = (int)(uintptr_t)file->private_data;
+    channel_id = (unsigned long)(uintptr_t)file->private_data;
     slot = all_slots[minor];
     channel = find_channel(slot,channel_id);
 
@@ -274,7 +251,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
 
     struct message_slot* slot;
     struct channel* channel;
-    int channel_id;
+    unsigned long channel_id;
     int minor;
     char* kernel_buffer;
     
@@ -293,7 +270,7 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
         printk(KERN_ERR "Illegal minor number: %d\n", minor);
         return -EINVAL;}
 
-    channel_id = (int)(uintptr_t)file->private_data;
+    channel_id = (unsigned long)(uintptr_t)file->private_data;
     slot = all_slots[minor];
     channel = find_channel(slot,channel_id);
 
@@ -382,7 +359,6 @@ static int device_open(struct inode* inode, struct file* file) {
     // update all_slots array
     all_slots[minor] = slot;
     // Init message_slot fields
-    slot->minor = minor;
     slot->channel_id = 0;
     slot->next = NULL;
     slot->tail = NULL;
@@ -408,7 +384,7 @@ static long device_ioctl(struct file *file, unsigned int ioctl_command_id, unsig
     struct message_slot* slot;
     struct channel* channel;
     int minor;
-    int channel_id;
+    unsigned long channel_id;
     int flag;
 
     printk(KERN_INFO "Entering device_ioctl\n");
@@ -426,7 +402,7 @@ static long device_ioctl(struct file *file, unsigned int ioctl_command_id, unsig
         printk(KERN_ERR "Illegal ioctl_param (channel): %ld\n", ioctl_param);
         return -EINVAL;}
 
-    channel_id = (int)ioctl_param;
+    channel_id = ioctl_param;
     minor = iminor(file->f_inode);
     if (!legal_minor(minor)) {
         printk(KERN_ERR "Illegal minor number: %d\n", minor);
