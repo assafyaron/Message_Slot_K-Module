@@ -20,7 +20,8 @@ int main(int argc, char *argv[]) {
         0 on success, 1 on failure
     */
 
-    int fd, channel_id;
+    int fd;
+    unsigned int channel_id;
     char* buffer;
     ssize_t bytes_written;
 
