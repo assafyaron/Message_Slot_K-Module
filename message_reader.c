@@ -18,7 +18,8 @@ int main(int argc, char *argv[]) {
         0 on success, 1 on failure
     */
 
-    int fd, channel_id;
+    int fd;
+    unsigned int channel_id;
     char buffer[MAX_MESSAGE_SIZE];
     ssize_t bytes_read;
 
