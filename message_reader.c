@@ -62,5 +62,5 @@ int main(int argc, char *argv[]) {
     // Print new line to standard output for better readability
     printf("\n");
 
-    return 0;
+    exit(0);
 }
