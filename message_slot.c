@@ -298,13 +298,8 @@ static ssize_t device_write(struct file* file, const char __user* buffer, size_t
         return -EIO;
     }
 
-    // Null terminate the message
-    kernel_buffer[length] = '\0';
-
     // Copy message on success and free kernel buffer
     strncpy(channel->message, kernel_buffer, MAX_MESSAGE_SIZE);
-    channel->message[MAX_MESSAGE_SIZE-1] = '\0';
-    channel->message[length] = '\0';
     kfree(kernel_buffer);
 
     printk(KERN_ERR "Device_write exits success\n");
