@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     */
 
     int fd;
-    unsigned int channel_id;
+    unsigned long channel_id;
     char buffer[MAX_MESSAGE_SIZE];
     ssize_t bytes_read;
 
@@ -58,9 +58,6 @@ int main(int argc, char *argv[]) {
         perror("Failed to write message to standard output\n");
         exit(1);
     }
-
-    // Print new line to standard output for better readability
-    printf("\n");
 
     exit(0);
 }
