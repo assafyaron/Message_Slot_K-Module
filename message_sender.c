@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
     */
 
     int fd;
-    unsigned int channel_id;
+    unsigned long channel_id;
     char* buffer;
     ssize_t bytes_written;
 
